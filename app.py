@@ -17,10 +17,20 @@ st.set_page_config(
 )
 
 def main():
-    st.title("🧬 Geroscience Target Explorer")
+    # --- Global SaaS Header / Hero Section ---
     st.markdown(
-        "Interactive multi-omic platform for geroscience target prioritization, "
-        "PPI network analysis, and objective evidence filtering."
+        """
+        <div style="background-color: #0e1117; padding: 20px; border-radius: 10px; border: 1px solid #262730; margin-bottom: 25px;">
+            <h1 style="color: #ffffff; font-family: 'Inter', sans-serif; font-weight: 700; margin-bottom: 5px;">
+                🧬 Geroscience Target Explorer
+            </h1>
+            <p style="color: #a3a8b4; font-size: 18px; font-family: 'Inter', sans-serif; margin-top: 0;">
+                AI-driven multi-omic prioritization platform for geroscience and longevity research. 
+                Integrating Mendelian Randomization, network topology, and aging hallmarks.
+            </p>
+        </div>
+        """,
+        unsafe_allow_html=True
     )
 
     # --- Sidebar: Scoring Weights & Parameters ---
@@ -40,8 +50,7 @@ def main():
         'safety_penalty': safety_penalty
     }
 
-    # Mock dataset для демонстрации и анализа таргетов
-    # В реальной системе сюда загружаются ваши многоомичные данные
+    # Dataset для демонстрации и анализа таргетов
     @st.cache_data
     def load_initial_data():
         data = {
@@ -60,13 +69,14 @@ def main():
 
     raw_df = load_initial_data()
 
-    # Расчет скоров и индекса объективности
+    # Расчет скоров и индекса объективности (Hard Evidence Ratio)
     ranked_df = calculate_target_scores(raw_df, weights)
 
-    # --- Navigation Tabs ---
-    tab_prioritization, tab_network, tab_pdf = st.tabs([
+    # --- Navigation Tabs (Global Audience Architecture) ---
+    tab_prioritization, tab_network, tab_methodology, tab_pdf = st.tabs([
         "📊 Target Prioritization", 
         "🕸️ PPI Network & Modules", 
+        "📚 Methodology & Data",
         "📄 Due Diligence PDF"
     ])
 
@@ -97,23 +107,47 @@ def main():
         st.subheader("Protein-Protein Interaction (PPI) & Functional Modules")
         st.write("Explore network clusters, connectivity degrees, and functional gene groupings.")
         
-        # Интеграция сетевого модуля
-        selected_gene = st.selectbox("Select Target Gene for Network Neighborhood:", ranked_df['Gene'].tolist())
+        selected_gene = st.selectbox("Select Target Gene for Network Neighborhood:", ranked_df['gene'].tolist())
         if st.button("Fetch & Analyze Network"):
             with st.spinner(f"Fetching interactions for {selected_gene} via STRING..."):
                 net_data = fetch_string_interactions(selected_gene)
                 st.success(f"Successfully loaded network context for {selected_gene}.")
-                # Здесь отображаются сетевые компоненты
+
+    with tab_methodology:
+        st.subheader("Methodological Framework & Data Provenance")
+        st.markdown("""
+        The **Geroscience Target Explorer** utilizes a multi-layered evidentiary framework designed to bridge the gap between statistical genetics and functional longevity biology, minimizing literature bias.
+
+        ---
+
+        ### 1. Core Scoring Components
+        * **Genetics / Causality (Mendelian Randomization):** Derived from large-scale GWAS summary statistics. Evaluates the causal effect of target expression on longevity or healthspan traits, returning robust instrumental variable $p$-values ($mr\_p\_value$).
+        * **Expression Dynamics (GTEx Age Slope):** Quantifies age-associated transcriptional changes across human tissues using data from the Genotype-Tissue Expression (GTEx) project. Targets with significant directional shifts in aging tissues are prioritized.
+        * **Hallmarks of Aging Coverage:** Evaluates target involvement across established biological hallmarks of aging (e.g., mitochondrial dysfunction, cellular senescence, genomic instability).
+        * **Network Centrality & Propagation:** Employs topological metrics (such as PageRank and betweenness centrality) over high-confidence Protein-Protein Interaction (PPI) networks (STRING database).
+
+        ---
+
+        ### 2. Mitigating Literature Bias: The Evidence-to-Bias Ratio
+        To counter the common bioinformatics pitfall where heavily studied genes (e.g., *TP53*, *APOE*) dominate rankings due to publication volume rather than biological merit, our platform introduces the **Evidence-to-Bias Ratio**:
+        * **Hard Evidence:** Driven strictly by raw statistical genetics (MR) and objective transcriptomic aging slopes.
+        * **Annotation/Network Weight:** Reflects topological and curated database context.
+        * *Targets with a high ratio ($>0.70$) represent high-confidence, data-driven candidates rather than historical literature favorites.*
+
+        ---
+
+        ### 3. Safety & Clinical Translation Filters
+        * **Oncogenic Safety Penalty ($\lambda$):** Implements a strict penalty multiplier for targets with annotated tumor-suppressive or oncogenic dual-roles, ensuring candidates are safe for healthy longevity interventions.
+        """)
 
     with tab_pdf:
         st.subheader("Generate Due Diligence Report")
         st.write("Export a formal PDF dossier summarizing target prioritization, safety profiles, and evidence ratios.")
         
-        target_for_pdf = st.selectbox("Select Target for Report:", ranked_df['Gene'].tolist(), key="pdf_target")
+        target_for_pdf = st.selectbox("Select Target for Report:", ranked_df['gene'].tolist(), key="pdf_target")
         if st.button("Generate & Download PDF Report"):
             pdf_file = generate_pdf_report(target_for_pdf, ranked_df)
             st.success(f"Report generated for {target_for_pdf}!")
-            # Кнопка скачивания файла отчета
 
 if __name__ == "__main__":
     main()
