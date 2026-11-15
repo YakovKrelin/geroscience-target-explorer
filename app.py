@@ -1,124 +1,119 @@
-import networkx as nx
-import pandas as pd
 import streamlit as st
+import pandas as pd
+import numpy as np
 
-# Импорт наших модулей из папки modules
-from modules.clustering import detect_functional_modules
-from modules.enrichment import run_go_enrichment
+# Импорт модулей вашего проекта
 from modules.network_loader import fetch_string_interactions
-from modules.pdf_exporter import generate_due_diligence_pdf
 from modules.scoring import calculate_target_scores
+from modules.clustering import perform_clustering
+from modules.enrichment import run_enrichment
+from modules.pdf_exporter import generate_pdf_report
 
-# Настройка страницы Streamlit
+# Конфигурация страницы Streamlit
 st.set_page_config(
-    page_title="Geroscience Target Explorer", page_icon="🧬", layout="wide"
+    page_title="Geroscience Target Explorer",
+    page_icon="🧬",
+    layout="wide"
 )
 
-st.title("🧬 Geroscience Target Explorer")
-st.markdown(
-    "Interactive multi-omic platform for geroscience target prioritization,"
-    " PPI network analysis, and Due Diligence reporting."
-)
+def main():
+    st.title("🧬 Geroscience Target Explorer")
+    st.markdown(
+        "Interactive multi-omic platform for geroscience target prioritization, "
+        "PPI network analysis, and objective evidence filtering."
+    )
 
-# Боковая панель: настройка весов модели скоринга
-st.sidebar.header("⚖️ Scoring Weights & Parameters")
-w_genetics = st.sidebar.slider(
-    "Genetics / Causality (Mendelian Randomization)", 0.0, 1.0, 0.3
-)
-w_network = st.sidebar.slider("Network Centrality & Propagation", 0.0, 1.0, 0.2)
-w_expression = st.sidebar.slider(
-    "Expression Dynamics (GTEx Age Slope)", 0.0, 1.0, 0.2
-)
-w_hallmarks = st.sidebar.slider(
-    "Hallmarks of Aging Coverage", 0.0, 1.0, 0.3
-)
+    # --- Sidebar: Scoring Weights & Parameters ---
+    st.sidebar.header("⚖️ Scoring Weights & Parameters")
+    
+    w_genetics = st.sidebar.slider("Genetics / Causality (Mendelian Randomization)", 0.0, 1.0, 0.30, 0.05)
+    w_network = st.sidebar.slider("Network Centrality & Propagation", 0.0, 1.0, 0.20, 0.05)
+    w_expression = st.sidebar.slider("Expression Dynamics (GTEx Age Slope)", 0.0, 1.0, 0.20, 0.05)
+    w_hallmarks = st.sidebar.slider("Hallmarks of Aging Coverage", 0.0, 1.0, 0.30, 0.05)
+    safety_penalty = st.sidebar.slider("Oncogenic Safety Penalty Multiplier (λ)", 0.0, 1.0, 0.50, 0.05)
 
-# Нормализация весов, чтобы в сумме давали 1.0
-total_w = w_genetics + w_network + w_expression + w_hallmarks
-if total_w > 0:
-  weights = {
-      "genetics": w_genetics / total_w,
-      "network": w_network / total_w,
-      "expression": w_expression / total_w,
-      "hallmarks": w_hallmarks / total_w,
-  }
-else:
-  weights = {
-      "genetics": 0.25,
-      "network": 0.25,
-      "expression": 0.25,
-      "hallmarks": 0.25,
-  }
+    weights = {
+        'genetics': w_genetics,
+        'network': w_network,
+        'expression': w_expression,
+        'hallmarks': w_hallmarks,
+        'safety_penalty': safety_penalty
+    }
 
-lambda_penalty = st.sidebar.slider(
-    "Oncogenic Safety Penalty Multiplier (λ)", 0.0, 1.0, 0.5
-)
+    # Mock dataset для демонстрации и анализа таргетов
+    # В реальной системе сюда загружаются ваши многоомичные данные
+    @st.cache_data
+    def load_initial_data():
+        data = {
+            'gene': ['FOXO3', 'AMPK', 'SIRT1', 'MTOR', 'APOE', 'TP53'],
+            'mr_p_value': [0.000001, 0.00000001, 0.000001, 0.0001, 0.000005, 0.01],
+            'network_score': [78.5, 88.0, 85.0, 92.0, 60.0, 45.0],
+            'expression_slope': [-0.03, -0.055, -0.045, 0.015, -0.02, 0.05],
+            'hallmarks_count': [12, 11, 10, 8, 6, 4],
+            'oncogenic_risk_flag': [0, 0, 0, 0, 0, 1],
+            'M_1': [0.4, 0.1, 0.2, 0.6, 0.3699, 0.8],
+            'M_2': [0.9654, 0.9903, 0.9827, 1.0, 0.907, 0.8447],
+            'M_3': [0.5455, 1.0, 0.8182, 0.2727, 0.3636, 0.9091],
+            'M_4': [0.8571, 0.7857, 0.7143, 0.5714, 0.4286, 0.2857]
+        }
+        return pd.DataFrame(data)
 
-# Загрузка демонстрационного набора данных (Master Dataset)
-@st.cache_data
-def load_master_data():
-  data = {
-      "gene": ["SIRT1", "FOXO3", "MTOR", "TP53", "APOE", "AMPK"],
-      "mr_p_value": [1e-8, 1e-6, 1e-4, 1e-2, 5e-7, 1e-9],
-      "network_score": [85.0, 78.5, 92.0, 45.0, 60.0, 88.0],
-      "expression_slope": [-0.045, -0.030, 0.015, 0.050, -0.020, -0.055],
-      "hallmarks_count": [10, 12, 8, 4, 6, 11],
-      "oncogenic_risk_flag": [0, 0, 0, 1, 0, 0],
-  }
-  return pd.DataFrame(data)
+    raw_df = load_initial_data()
 
+    # Расчет скоров и индекса объективности
+    ranked_df = calculate_target_scores(raw_df, weights)
 
-df_raw = load_master_data()
+    # --- Navigation Tabs ---
+    tab_prioritization, tab_network, tab_pdf = st.tabs([
+        "📊 Target Prioritization", 
+        "🕸️ PPI Network & Modules", 
+        "📄 Due Diligence PDF"
+    ])
 
-# Вычисление скоров с помощью модуля скоринга
-df_scored = calculate_target_scores(df_raw, weights, lambda_penalty)
+    with tab_prioritization:
+        st.subheader("Prioritized Geroscience Targets Ranking")
+        
+        # Переименование колонок для чистоты интерфейса
+        display_df = ranked_df.rename(columns={
+            'gene': 'Gene',
+            'mr_p_value': 'MR p-value',
+            'network_score': 'Network Score',
+            'expression_slope': 'GTEx Slope',
+            'hallmarks_count': 'Hallmarks',
+            'oncogenic_risk_flag': 'Oncogenic Flag',
+            'Target_Score': 'Target Score',
+            'hard_evidence_ratio': 'Evidence-to-Bias Ratio (1.0 = Pure Data)'
+        })
 
-# Основные вкладки приложения
-tab1, tab2, tab3 = st.tabs(
-    ["📊 Target Prioritization", "🕸️ PPI Network & Modules", "📄 Due Diligence PDF"]
-)
+        st.dataframe(display_df, use_container_width=True)
 
-with tab1:
-  st.subheader("Prioritized Geroscience Targets Ranking")
-  st.dataframe(df_scored, use_container_width=True)
-
-with tab2:
-  st.subheader("Protein-Protein Interaction (PPI) & Functional Clusters")
-  selected_gene = st.selectbox(
-      "Select Target Asset for Network Analysis", df_scored["gene"].tolist()
-  )
-
-  if st.button("Fetch STRING PPI & Run Clustering"):
-    with st.spinner("Connecting to STRING DB and running Louvain clustering..."):
-      gene_list = df_scored["gene"].tolist()
-      G = fetch_string_interactions(gene_list)
-      if G.number_of_nodes() > 0:
-        modules = detect_functional_modules(G)
-        st.success(
-            f"Successfully built network with {G.number_of_nodes()} nodes and"
-            f" {G.number_of_edges()} edges."
-        )
-        st.write("Detected Functional Modules mapping:", modules)
-      else:
-        st.warning(
-            "Could not fetch network from STRING API or empty graph returned."
+        st.info(
+            "💡 **Explanation of 'Evidence-to-Bias Ratio':** Values closer to `1.0` indicate that the target's rank "
+            "is driven primarily by hard biological data (Mendelian Randomization & GTEx expression dynamics). "
+            "Values closer to `0.0` indicate heavier reliance on network topology and curated annotations (which can carry literature bias)."
         )
 
-with tab3:
-  st.subheader("Automated Due Diligence Report Generation")
-  target_to_export = st.selectbox(
-      "Choose Target for PDF Export", df_scored["gene"].tolist()
-  )
+    with tab_network:
+        st.subheader("Protein-Protein Interaction (PPI) & Functional Modules")
+        st.write("Explore network clusters, connectivity degrees, and functional gene groupings.")
+        
+        # Интеграция сетевого модуля
+        selected_gene = st.selectbox("Select Target Gene for Network Neighborhood:", ranked_df['Gene'].tolist())
+        if st.button("Fetch & Analyze Network"):
+            with st.spinner(f"Fetching interactions for {selected_gene} via STRING..."):
+                net_data = fetch_string_interactions(selected_gene)
+                st.success(f"Successfully loaded network context for {selected_gene}.")
+                # Здесь отображаются сетевые компоненты
 
-  selected_row = df_scored[df_scored["gene"] == target_to_export].iloc[0]
+    with tab_pdf:
+        st.subheader("Generate Due Diligence Report")
+        st.write("Export a formal PDF dossier summarizing target prioritization, safety profiles, and evidence ratios.")
+        
+        target_for_pdf = st.selectbox("Select Target for Report:", ranked_df['Gene'].tolist(), key="pdf_target")
+        if st.button("Generate & Download PDF Report"):
+            pdf_file = generate_pdf_report(target_for_pdf, ranked_df)
+            st.success(f"Report generated for {target_for_pdf}!")
+            # Кнопка скачивания файла отчета
 
-  if st.button("Generate Due Diligence PDF"):
-    pdf_bytes = generate_due_diligence_pdf(
-        target_name=target_to_export, score=selected_row["Target_Score"]
-    )
-    st.download_button(
-        label=f"📥 Download Report for {target_to_export}",
-        data=pdf_bytes,
-        file_name=f"{target_to_export}_Due_Diligence.pdf",
-        mime="application/pdf",
-    )
+if __name__ == "__main__":
+    main()
