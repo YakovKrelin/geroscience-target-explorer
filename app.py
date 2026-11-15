@@ -5,7 +5,7 @@ import streamlit as st
 # Импорт наших модулей из папки modules
 from modules.clustering import detect_functional_modules
 from modules.enrichment import run_go_enrichment
-from modules.net_loader import fetch_string_interactions
+from modules.network_loader import fetch_string_interactions
 from modules.pdf_exporter import generate_due_diligence_pdf
 from modules.scoring import calculate_target_scores
 
