@@ -2,7 +2,7 @@ import networkx as nx
 import pandas as pd
 import numpy as np
 
-# Безопасный импорт алгоритмов сообществ с запасным вариантом
+# Safe import of community algorithms with a fallback option
 try:
     from networkx.algorithms.community import louvain_communities
 except ImportError:
@@ -13,23 +13,23 @@ except ImportError:
 
 def perform_clustering(data, threshold=0.3):
     """
-    Выполняет кластеризацию и анализ сети на основе переданных данных или матрицы.
-    
-    Параметры:
-    - data: pandas DataFrame или матрица связей/признаков.
-    - threshold: порог фильтрации ребер для построения графа.
-    
-    Возвращает:
-    - G: построенный граф NetworkX
-    - communities: найденные сообщества
-    - metrics: словарь с базовыми метриками графа
+    Performs clustering and network analysis based on the transferred data or matrix. 
+
+    Parameters: 
+    - data: pandas DataFrame or matrix of connections/features. 
+    - threshold: edge filtering threshold for constructing a graph. 
+
+    Returns: 
+    - G: constructed NetworkX graph 
+    - communities: found communities 
+    - metrics: dictionary with basic graph metrics     
     """
-    # Создаем граф на основе входных данных
+    # Create a graph based on the input data
     G = nx.Graph()
     
     if isinstance(data, pd.DataFrame):
-        # Если передан DataFrame с корреляциями или признаками, строим граф
-        # Пример: предполагаем, что это квадратная матрица корреляций/весов
+        # If a DataFrame containing correlations or features is provided, we construct a graph.
+        # Example: we assume that this is a square matrix of correlations/weights
         if data.shape[0] == data.shape[1]:
             for i in range(len(data.columns)):
                 for j in range(i + 1, len(data.columns)):
@@ -37,7 +37,7 @@ def perform_clustering(data, threshold=0.3):
                     if abs(weight) >= threshold:
                         G.add_edge(data.columns[i], data.columns[j], weight=float(weight))
         else:
-            # Альтернатива: корреляция между строками/столбцами
+            # Alternative: correlation between rows/columns
             corr_matrix = data.corr(numeric_only=True)
             for i in range(len(corr_matrix.columns)):
                 for j in range(i + 1, len(corr_matrix.columns)):
@@ -45,17 +45,17 @@ def perform_clustering(data, threshold=0.3):
                     if not np.isnan(weight) and abs(weight) >= threshold:
                         G.add_edge(corr_matrix.columns[i], corr_matrix.columns[j], weight=float(weight))
     
-    # Если граф пустой (нет ребер, удовлетворяющих порогу), добавляем базовую структуру, чтобы избежать падений
+    # If the graph is empty (no edges satisfying the threshold), add a basic structure to avoid crashes
     if G.number_of_edges() == 0 and isinstance(data, pd.DataFrame) and len(data.columns) > 0:
-        cols = list(data.columns[:5]) # Берем первые несколько колонок для примера
+        cols = list(data.columns[:5]) # Take the first few columns for example
         for i in range(len(cols) - 1):
             G.add_edge(cols[i], cols[i+1], weight=1.0)
 
-    # Поиск сообществ
+    # Search for communities
     communities = []
     if G.number_of_nodes() > 0 and louvain_communities is not None:
         try:
-            # Для Louvain желательно наличие весов
+            # For the Louvain algorithm, it is desirable to have weights.
             communities = list(louvain_communities(G, weight='weight'))
         except Exception:
             try:
@@ -65,7 +65,7 @@ def perform_clustering(data, threshold=0.3):
     elif G.number_of_nodes() > 0:
         communities = [set(G.nodes())]
 
-    # Базовые метрики графа
+    # Basic graph metrics
     metrics = {
         "nodes_count": G.number_of_nodes(),
         "edges_count": G.number_of_edges(),

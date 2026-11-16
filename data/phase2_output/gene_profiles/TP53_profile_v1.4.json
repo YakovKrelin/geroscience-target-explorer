@@ -1,0 +1,50 @@
+{
+    "gene_symbol": "TP53",
+    "overall_priority": "Moderate",
+    "calibrated_probability": 0.55,
+    "probability_ci": [
+        0.4,
+        0.7
+    ],
+    "evidence_axes": {
+        "human_genetic": {
+            "score": 0.5,
+            "confidence_grade": "C",
+            "sources": [
+                "Open Targets v23"
+            ],
+            "description": "Moderate association signals."
+        },
+        "perturbation": {
+            "score": 0.45,
+            "confidence_grade": "C",
+            "sources": [
+                "High-throughput screens"
+            ],
+            "description": "Preliminary functional data."
+        }
+    },
+    "causal_profile": {
+        "is_causal_driver": false,
+        "causal_score": 0.5,
+        "recommended_modality": "modulation",
+        "direction_of_effect": "context-dependent",
+        "expected_benefit": "Potential metabolic or cellular maintenance effect",
+        "known_risks": [
+            "Uncharacterized off-target phenotypes"
+        ]
+    },
+    "tissue_specificity": {
+        "brain": 0.5,
+        "immune_cells": 0.5,
+        "skeletal_muscle": 0.5,
+        "liver": 0.5
+    },
+    "safety_and_tractability": {
+        "loeuf_score": 0.5,
+        "essential_gene": false,
+        "druggability_tier": "Tier 3"
+    },
+    "data_completeness": 0.6,
+    "recommended_action": "Requires deeper multi-axis data collection before experimental triage."
+}

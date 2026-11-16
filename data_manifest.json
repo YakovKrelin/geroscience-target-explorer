@@ -1,0 +1,68 @@
+{
+  "manifest_type": "data_manifest",
+  "version": "v1.2.1-Implementation-Freeze",
+  "generated_at": "2026-11-16T19:04:00.533307+00:00",
+  "total_files": 12,
+  "files": [
+    {
+      "relative_path": "dry_run\\normalized_output_features.csv",
+      "size_bytes": 399,
+      "sha256": "30f588c3f81323aea2325208c2d4b43e9164fd2f1b5b602770c692b4551b16b7"
+    },
+    {
+      "relative_path": "dry_run\\synthetic_input_features.csv",
+      "size_bytes": 426,
+      "sha256": "413ed074888ba073f35b15704c71eddd3158d39604a47cd6a2cc2aeaabf98fec"
+    },
+    {
+      "relative_path": "phase1_output\\mageck_rra_results.csv",
+      "size_bytes": 307,
+      "sha256": "646559c82358f758f719bab33c9c44dd437d89800dd4e66840e97cad264b620e"
+    },
+    {
+      "relative_path": "phase1_output\\normalized_screening_counts.csv",
+      "size_bytes": 1991,
+      "sha256": "af5855371dd2a86d49db947bdf536c6863735425c851626d40bd4e645cb397a7"
+    },
+    {
+      "relative_path": "phase1_output\\screening_counts_input.csv",
+      "size_bytes": 535,
+      "sha256": "51f9419121ce1775087960da3d775b4f52f84536a3112c37a04793c41ea64b88"
+    },
+    {
+      "relative_path": "phase2_output\\mageck_rra_results.csv",
+      "size_bytes": 307,
+      "sha256": "646559c82358f758f719bab33c9c44dd437d89800dd4e66840e97cad264b620e"
+    },
+    {
+      "relative_path": "phase2_output\\normalized_screening_counts.csv",
+      "size_bytes": 1991,
+      "sha256": "af5855371dd2a86d49db947bdf536c6863735425c851626d40bd4e645cb397a7"
+    },
+    {
+      "relative_path": "phase2_output\\phase2_prioritized_targets.csv",
+      "size_bytes": 792,
+      "sha256": "2b6912e1a933cc5ac04faf2828167e51400dde251e0dcee876dd8e58d1578af4"
+    },
+    {
+      "relative_path": "phase2_output\\screening_counts_input.csv",
+      "size_bytes": 535,
+      "sha256": "51f9419121ce1775087960da3d775b4f52f84536a3112c37a04793c41ea64b88"
+    },
+    {
+      "relative_path": "phase2_output\\target_prioritization_summary.md",
+      "size_bytes": 2018,
+      "sha256": "f0aaae4366861d4b05a0844fb608ec8414115c319f82eb0fc47aebdac277935d"
+    },
+    {
+      "relative_path": "test_output\\mageck_rra_results.csv",
+      "size_bytes": 162,
+      "sha256": "69297b94dfe5fee379e9d89040c3cc9d9c4c06a3a75e4d73a003b7d1f6fe828c"
+    },
+    {
+      "relative_path": "test_phase2_output\\phase2_prioritized_targets.csv",
+      "size_bytes": 462,
+      "sha256": "6fe7221b2a3ce46622828d8f1b3752a34a9d2b3dc80a73dc11fc743ea2d26858"
+    }
+  ]
+}

@@ -1,7 +1,7 @@
 import pandas as pd
 import numpy as np
 
-# Безопасный импорт библиотек для обогащения (например, gseapy)
+# Safe import of libraries for enrichment (e.g., gseapy)
 try:
     import gseapy as gp
 except ImportError:
@@ -9,12 +9,12 @@ except ImportError:
 
 def run_enrichment(gene_list, organism='human', gene_sets='GO_Biological_Process_2021'):
     """
-    Выполняет анализ обогащения для заданного списка генов с защитой от сбоев.
+    Performs enrichment analysis for a given list of genes with error handling.
     """
     if not gene_list:
         return pd.DataFrame(columns=['Term', 'Overlap', 'Adjusted P-value', 'Genes'])
     
-    # Если библиотека доступна, выполняем расчет
+    # If the library is available, we perform the calculation.
     if gp is not None:
         try:
             enr = gp.enrichr(
@@ -28,7 +28,7 @@ def run_enrichment(gene_list, organism='human', gene_sets='GO_Biological_Process
         except Exception:
             pass
             
-    # Безопасный резервный результат, предотвращающий падение приложения
+    # A safe fallback result that prevents the application from crashing
     mock_data = {
         'Term': ['Aging-associated pathway', 'Cellular senescence', 'DNA repair regulation'],
         'Overlap': ['5/100', '3/100', '4/100'],

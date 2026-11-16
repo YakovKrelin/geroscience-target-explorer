@@ -1,0 +1,41 @@
+project:
+  name: "Geroscience Discovery Platform"
+  version: "v1.2.1-Implementation-Freeze"
+  random_seed: 20261116
+
+normalization:
+  method: "robust_z_score"
+  mad_scale_factor: 1.4826
+  clip_range: [-5.0, 5.0]
+  fallback_rules:
+    mad_zero_valid_coverage_threshold: 0.40
+    fallback_action_if_valid: "rank_percentile_normalization"
+    fallback_action_if_invalid: "set_null"
+
+data_suitability:
+  mandatory_criteria:
+    - "measurement_availability"
+    - "sample_size_threshold"
+    - "correct_gene_annotation"
+  important_criteria:
+    - "independent_replication"
+  supportive_criteria:
+    - "aging_relevance"
+    - "assay_quality"
+
+test_c:
+  primary_method: "MAGeCK-RRA"
+  secondary_method: "MAGeCK-MLE"
+  method_selection_rule: "RRA_if_two_conditions_else_MLE"
+  gene_level_fdr: 0.10
+  min_valid_sgrna_per_gene: 3
+  min_consistent_sgrna: 2
+  min_biological_replicates: 3
+  min_median_coverage_per_sgrna: 300
+  normalization: "median"
+  multiple_testing: "Benjamini-Highberg"
+
+thresholds:
+  min_causality_score_for_validation: 30.0
+  min_novelty_for_discovery: 70.0
+  min_independent_bio_score: 50.0

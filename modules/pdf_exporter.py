@@ -1,7 +1,7 @@
 import pandas as pd
 import io
 
-# Безопасный импорт reportlab с запасным вариантом
+# Safe import of reportlab with a fallback option
 try:
     from reportlab.lib.pagesizes import letter
     from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer
@@ -12,10 +12,10 @@ except ImportError:
 
 def generate_pdf_report(data=None, filename="report.pdf"):
     """
-    Генерирует PDF-отчет с защитой от падений при отсутствии reportlab.
+    Generates a PDF report with error handling for missing reportlab dependency.
     """
     if not REPORTLAB_AVAILABLE:
-        # Возвращаем текстовый байтовый буфер как безопасную заглушку
+        # Returning a text byte buffer as a safe placeholder
         return io.BytesIO(b"PDF generation requires reportlab package.")
     
     buffer = io.BytesIO()

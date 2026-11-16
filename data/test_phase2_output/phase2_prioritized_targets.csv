@@ -1,0 +1,4 @@
+gene_symbol,gps_score,hallmark_count,hallmarks,stat_component_score,hallmark_component_score,effect_component_score,fdr,lfc
+FOXO3,55.87,3,Deregulated nutrient-sensing; Cellular senescence; Chronic inflammation,23.01,75.0,83.33,0.005,2.5
+TP53,49.68,3,Genomic instability; Cellular senescence; Mitochondrial dysfunction,19.21,75.0,60.0,0.012,-1.8
+SIRT6,35.72,3,Epigenetic alterations; Genomic instability; Deregulated nutrient-sensing,10.97,75.0,6.67,0.08,0.2

@@ -1,0 +1,68 @@
+{
+    "gene_symbol": "FOXO3",
+    "overall_priority": "High",
+    "calibrated_probability": 0.82,
+    "probability_ci": [
+        0.71,
+        0.9
+    ],
+    "evidence_axes": {
+        "human_genetic": {
+            "score": 0.9,
+            "confidence_grade": "A",
+            "sources": [
+                "GWAS Longevity",
+                "Mendelian Randomization"
+            ],
+            "description": "Strong genetic association with extreme human lifespan."
+        },
+        "perturbation": {
+            "score": 0.78,
+            "confidence_grade": "B+",
+            "sources": [
+                "CRISPR activation assays"
+            ],
+            "description": "Upregulation enhances cellular stress resistance."
+        },
+        "model_organism": {
+            "score": 0.88,
+            "confidence_grade": "A",
+            "sources": [
+                "C. elegans daf-16",
+                "Mouse models"
+            ],
+            "description": "Extended lifespan and healthspan across species."
+        },
+        "clinical_translational": {
+            "score": 0.68,
+            "confidence_grade": "B",
+            "sources": [
+                "Biomarker cohorts"
+            ],
+            "description": "Correlates with reduced cardiometabolic risk."
+        }
+    },
+    "causal_profile": {
+        "is_causal_driver": true,
+        "causal_score": 0.85,
+        "recommended_modality": "activation",
+        "direction_of_effect": "benefit on activation",
+        "expected_benefit": "Improved stress resilience, enhanced proteostasis, metabolic health",
+        "known_risks": [
+            "Context-dependent tumor suppression/progression roles in specific cancer subtypes"
+        ]
+    },
+    "tissue_specificity": {
+        "brain": 0.85,
+        "immune_cells": 0.9,
+        "skeletal_muscle": 0.8,
+        "liver": 0.75
+    },
+    "safety_and_tractability": {
+        "loeuf_score": 0.35,
+        "essential_gene": false,
+        "druggability_tier": "Tier 2 (Upstream kinase modulation via AKT/SGK)"
+    },
+    "data_completeness": 0.88,
+    "recommended_action": "Prioritize for experimental validation in human iPSC-derived cells."
+}

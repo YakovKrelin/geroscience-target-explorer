@@ -1,0 +1,16 @@
+{
+    "brier_score": 0.0859,
+    "pr_auc": 0.9667,
+    "calibration_quality": "Excellent (Well-Calibrated)",
+    "sample_size": 10,
+    "reliability_diagram": {
+        "fraction_of_positives": [
+            0.2,
+            1.0
+        ],
+        "mean_predicted_probability": [
+            0.15,
+            0.9311777569509528
+        ]
+    }
+}

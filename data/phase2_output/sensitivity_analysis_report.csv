@@ -1,0 +1,7 @@
+gene_symbol,mean,std,min,max
+FOXO3,1.0,0.0,1,1
+MTOR,2.0,0.0,2,2
+TP53,3.0,0.0,3,3
+IGF1R,4.0,0.0,4,4
+TERT,5.0,0.0,5,5
+SIRT6,6.0,0.0,6,6

@@ -4,7 +4,7 @@ import requests
 
 
 def fetch_string_interactions(gene_list: list, species_taxid: int = 9606):
-  """Загружает PPI сети из STRING API для списка генов."""
+  """Retrieves the PPI network from the STRING API for a list of genes."""
   string_api_url = "https://string-db.org/api/json/network"
   params = {
       "identifiers": "\r".join(gene_list),
@@ -25,5 +25,5 @@ def fetch_string_interactions(gene_list: list, species_taxid: int = 9606):
         G.add_edge(u, v, weight=float(w) / 1000.0)
       return G
   except Exception as e:
-    print(f"Ошибка при запросе к STRING API: {e}")
+    print(f"Error while requesting the STRING API: {e}")
   return nx.Graph()
